@@ -1,8 +1,6 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js'; 
-import { XRButton } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/webxr/XRButton.js'; 
-//import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/GLTFLoader.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.155.0/examples/jsm/loaders/GLTFLoader.js';
-
+import * as THREE from 'three';
+import { XRButton } from 'three/examples/jsm/webxr/XRButton.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 let camera, scene, renderer;
 let cube;
