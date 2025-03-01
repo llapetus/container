@@ -6,6 +6,7 @@ let camera, scene, renderer;
 let cube;
 let angle = 0;
 const radius = 2;
+const clock = new THREE.Clock(); // Add a clock
 
 init();
 animate();
@@ -54,7 +55,8 @@ function animate() {
 }
 
 function render() {
-  angle += 0.01;
+  const delta = clock.getDelta(); 
+  angle += delta * 1.5; 
   camera.position.x = Math.cos(angle) * radius;
   camera.position.z = Math.sin(angle) * radius;
   camera.lookAt(0, 0, 0);
