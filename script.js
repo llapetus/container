@@ -1,5 +1,6 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js';
 import { XRButton } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/webxr/XRButton.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/GLTFLoader.js';
 
 let camera, scene, renderer;
 let cube;
@@ -9,6 +10,16 @@ const radius = 2;
 init();
 animate();
 
+function loadModel(scene) {
+    const loader = new GLTFLoader();
+    
+    loader.load('/models/model.glb', function (gltf) {
+        scene.add(gltf.scene);
+    }, undefined, function (error) {
+        console.error(error);
+    });
+}
+
 function init() {
     const container = document.createElement('div');
     document.body.appendChild(container);
@@ -16,7 +27,8 @@ function init() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10);
-    
+    camera.position.set(0, 1, 3); 
+
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
@@ -32,6 +44,7 @@ function init() {
     const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
     cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
+    loadModel(scene)
 }
 
 function animate() {
