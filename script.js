@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js'; 
 import { XRButton } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/webxr/XRButton.js'; 
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/GLTFLoader.js';
+//import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/GLTFLoader.js';
 
 let camera, scene, renderer;
 let cube;
@@ -10,16 +10,16 @@ const radius = 2;
 init();
 animate();
 
-function loadModel(scene) {
-  const loader = new GLTFLoader();
+// function loadModel(scene) {
+//   const loader = new GLTFLoader();
   
-  // Use a relative path if your models folder is within your project structure.
-  loader.load('./models/scene.gltf', function (gltf) {
-    scene.add(gltf.scene);
-  }, undefined, function (error) {
-    console.error('Error loading model:', error);
-  });
-}
+//   // Use a relative path if your models folder is within your project structure.
+//   loader.load('./models/scene.gltf', function (gltf) {
+//     scene.add(gltf.scene);
+//   }, undefined, function (error) {
+//     console.error('Error loading model:', error);
+//   });
+// }
 
 function init() {
   const container = document.createElement('div');
