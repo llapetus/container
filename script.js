@@ -46,7 +46,7 @@ function init() {
   cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
   
- // loadModel(scene);
+  loadModel(scene);
 }
 
 function animate() {
