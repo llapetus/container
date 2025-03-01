@@ -13,10 +13,10 @@ animate();
 function loadModel(scene) {
     const loader = new GLTFLoader();
     
-   loader.load('/models/scene.gltf', function (gltf) {
-    scene.add(gltf.scene);
+  loader.load('./models/scene.gltf', function (gltf) {
+  scene.add(gltf.scene);
 }, undefined, function (error) {
-    console.error(error);
+  console.error(error);
 });
 
 }
