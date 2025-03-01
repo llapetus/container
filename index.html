@@ -4,7 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Three.js WebXR</title>
-    <script type="module" src="script.js"></script>
+      <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js",
+      "three/examples/jsm/webxr/XRButton.js": "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/webxr/XRButton.js",
+      "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/GLTFLoader.js"
+    }
+  }
+  </script>
+  <script type="module" src="script.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;"></body>
 </html>
