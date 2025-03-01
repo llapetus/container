@@ -44,7 +44,7 @@ function init() {
   const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
   const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
   cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+  //scene.add(cube);
   
 loadModel(scene);
 }
