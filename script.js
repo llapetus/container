@@ -3,10 +3,14 @@ import { XRButton } from 'three/examples/jsm/webxr/XRButton.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 let camera, scene, renderer;
-let cube;
+const cubes = [];  // Store cubes
+const gridSize = 10;
+const spacing = 0.6;
+let cube = [];
 let angle = 0;
 const radius = 2;
-const clock = new THREE.Clock(); // Add a clock
+
+const clock = new THREE.Clock();
 
 init();
 animate();
@@ -41,13 +45,28 @@ function init() {
   const light = new THREE.HemisphereLight(0xffffff, 0x444444);
   light.position.set(0, 2, 0);
   scene.add(light);
+  loadModel(scene);
+  createGrid(); // Create cubes
+}
 
+function createGrid() {
   const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
   const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-  cube = new THREE.Mesh(geometry, material);
-  //scene.add(cube);
-  
-loadModel(scene);
+
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      const cube = new THREE.Mesh(geometry, material);
+
+      cube.position.set(
+        (i - gridSize / 2) * spacing,
+        Math.random() * 2,  // Random height
+        (j - gridSize / 2) * spacing
+      );
+
+      scene.add(cube);
+      cubes.push(cube); // Store cube in the array
+    }
+  }
 }
 
 function animate() {
@@ -56,9 +75,20 @@ function animate() {
 
 function render() {
   const delta = clock.getDelta(); 
+    const time = clock.getElapsedTime(); // Get elapsed time
+  
   angle += delta * 1.5; 
   camera.position.x = Math.cos(angle) * radius;
   camera.position.z = Math.sin(angle) * radius;
   camera.lookAt(0, 0, 0);
+
+   // Apply transformations (wave effect)
+  cubes.forEach((cube, index) => {
+    const x = cube.position.x;
+    const z = cube.position.z;
+    cube.position.y = Math.sin(time + x + z) * 1.5; // Wave motion
+    cube.rotation.y += 0.01; // Rotate
+  });
+  
   renderer.render(scene, camera);
 }
