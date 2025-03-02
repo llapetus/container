@@ -14,13 +14,14 @@ const clock = new THREE.Clock();
 
 init();
 animate();
-
 function loadModel(scene) {
   const loader = new GLTFLoader();
   
-  // Use a relative path if your models folder is within your project structure.
   loader.load('./models/scene.gltf', function (gltf) {
-    scene.add(gltf.scene);
+    // Scale down the model
+    gltf.scene.scale.set(0.5, 0.5, 0.5); // Adjust values as needed
+
+    scene.add(gltf.scene); // Add the model to the scene
   }, undefined, function (error) {
     console.error('Error loading model:', error);
   });
@@ -33,7 +34,7 @@ function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10);
-  camera.position.set(0, 1, 3); 
+  camera.position.set(0, 1, 10); 
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -50,7 +51,7 @@ function init() {
 }
 
 function createGrid() {
-  const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+  const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
   const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
 
   for (let i = 0; i < gridSize; i++) {
