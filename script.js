@@ -16,6 +16,8 @@ animate();
 document.addEventListener('mousemove', handleMouseMove);
 window.addEventListener('resize', onWindowResize);
 
+
+
 function init() {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -37,9 +39,22 @@ function init() {
   scene.add(light);
 
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  const geometry = new THREE.BoxGeometry(1, 1, 1); // Correct definition
-  const mesh = new THREE.Mesh(geometry, material);
+  const boxGeometry = new THREE.BoxGeometry(1, 1, 1); // Correct definition
+  const mesh = new THREE.Mesh(boxGeometry, material);
   scene.add(mesh);
+
+  const vertices = [];
+
+  for (let i = 0; i < 10000; i++) {
+    vertices.push(THREE.MathUtils.randFloatSpread(2000)); // x
+    vertices.push(THREE.MathUtils.randFloatSpread(2000)); // y
+    vertices.push(THREE.MathUtils.randFloatSpread(2000)); // z
+  }
+
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+  const particles = new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0x888888 }));
+  scene.add(particles);
 
   loadModel();
   createGrid();
