@@ -3,86 +3,57 @@ import { XRButton } from 'three/examples/jsm/webxr/XRButton.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 let camera, scene, renderer;
-const cubes = []; // Store cubes
+const cubes = []; // Store cubes for grid
 const gridSize = 10;
 const spacing = 0.6;
 const radius = 2;
-const clock = new THREE.Clock();
 let angle = 0;
+const clock = new THREE.Clock();
 
-init();
-animate();
-
-document.addEventListener('mousemove', handleMouseMove);
-window.addEventListener('resize', onWindowResize);
-
-
-
-function init() {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
+function initThree() {
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10);
+  // Use p5's width/height for Three.js camera aspect & renderer size
+  camera = new THREE.PerspectiveCamera(70, windowWidth / windowHeight, 0.1, 10);
   camera.position.set(0, 1, 10);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  // Create a Three.js renderer; we allow transparency so p5.js background can show if desired
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(windowWidth, windowHeight);
   renderer.xr.enabled = true;
-  container.appendChild(renderer.domElement);
+  // Append the Three.js canvas to the document.
+  document.body.appendChild(renderer.domElement);
   document.body.appendChild(XRButton.createButton(renderer));
 
+  // Add light to the scene.
   const light = new THREE.HemisphereLight(0xffffff, 0x444444);
   light.position.set(0, 2, 0);
   scene.add(light);
 
+  // Add a static cube to the scene.
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  const boxGeometry = new THREE.BoxGeometry(1, 1, 1); // Correct definition
+  const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const mesh = new THREE.Mesh(boxGeometry, material);
   scene.add(mesh);
 
-  
-  const geometry = new THREE.BufferGeometry();
+  // Create a particle system.
+  const particlesGeometry = new THREE.BufferGeometry();
   const vertices = [];
-
   for (let i = 0; i < 10000; i++) {
     vertices.push(THREE.MathUtils.randFloatSpread(2000)); // x
     vertices.push(THREE.MathUtils.randFloatSpread(2000)); // y
     vertices.push(THREE.MathUtils.randFloatSpread(2000)); // z
   }
-
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-  const particles = new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0x888888 }));
+  particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  const particles = new THREE.Points(
+    particlesGeometry,
+    new THREE.PointsMaterial({ color: 0x888888 })
+  );
   scene.add(particles);
 
-  loadModel();
+  // Create a grid of cubes.
   createGrid();
-}
-
-function handleMouseMove(event) {
-  const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-  const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-  camera.rotation.y = mouseX * Math.PI * 0.5;
-  camera.rotation.x = mouseY * Math.PI * 0.5;
-}
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function loadModel() {
-  const loader = new GLTFLoader();
-  loader.load('./models/scene.gltf', (gltf) => {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    scene.add(gltf.scene);
-  }, undefined, (error) => {
-    console.error('Error loading model:', error);
-  });
 }
 
 function createGrid() {
@@ -103,25 +74,56 @@ function createGrid() {
   }
 }
 
-function animate() {
-  renderer.setAnimationLoop(render);
-}
-
-function render() {
+function updateScene() {
   const delta = clock.getDelta();
   const time = clock.getElapsedTime();
 
+  // Update camera position to move in a circle around the origin.
   angle += delta * 1.5;
   camera.position.x = Math.cos(angle) * radius;
   camera.position.z = Math.sin(angle) * radius;
   camera.lookAt(0, 0, 0);
 
-  // Apply transformations (wave effect)
+  // Apply wave effect and rotation to grid cubes.
   cubes.forEach((cube) => {
     const { x, z } = cube.position;
     cube.position.y = Math.sin(time + x + z) * 1.5;
     cube.rotation.y += 0.01;
   });
+}
 
+// === p5.js functions ===
+
+function setup() {
+  // Create a p5 canvas (this can serve as your UI/background layer).
+  createCanvas(windowWidth, windowHeight);
+  // Initialize Three.js (it creates its own canvas which is appended to the document).
+  initThree();
+}
+
+function draw() {
+  // Optional: draw a p5 background (this draws on the p5 canvas, which is separate from the Three.js canvas).
+  background(200);
+
+  // Update Three.js scene elements.
+  updateScene();
+
+  // Render the Three.js scene.
   renderer.render(scene, camera);
+}
+
+// Instead of document.addEventListener('mousemove', ...), use p5's mouseMoved.
+function mouseMoved() {
+  const mouseXNorm = (mouseX / windowWidth) * 2 - 1;
+  const mouseYNorm = -(mouseY / windowHeight) * 2 + 1;
+  camera.rotation.y = mouseXNorm * Math.PI * 0.5;
+  camera.rotation.x = mouseYNorm * Math.PI * 0.5;
+}
+
+// Use p5's windowResized instead of window.addEventListener.
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  camera.aspect = windowWidth / windowHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(windowWidth, windowHeight);
 }
