@@ -43,6 +43,8 @@ function init() {
   const mesh = new THREE.Mesh(boxGeometry, material);
   scene.add(mesh);
 
+  
+  const geometry = new THREE.BufferGeometry();
   const vertices = [];
 
   for (let i = 0; i < 10000; i++) {
