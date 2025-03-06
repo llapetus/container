@@ -43,7 +43,6 @@ function init() {
   light.position.set(0, 2, 0);
 
   loadModel(scene);
-  //createGrid(); // Create cubes
   scene.add(mesh);
   scene.add(light);
 
