@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { XRButton } from 'three/examples/jsm/webxr/XRButton.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
+import 
 let camera, scene, renderer;
 const cubes = []; // Store cubes for grid
 const gridSize = 10;
@@ -95,9 +95,11 @@ function updateScene() {
 // === p5.js functions ===
 
 function setup() {
+  
   // Create a p5 canvas (this can serve as your UI/background layer).
   createCanvas(windowWidth, windowHeight);
-  // Initialize Three.js (it creates its own canvas which is appended to the document).
+  
+  background(black);// Initialize Three.js (it creates its own canvas which is appended to the document).
   initThree();
 }
 
