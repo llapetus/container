@@ -43,7 +43,7 @@ function init() {
   const mesh = new THREE.Mesh(boxGeometry, material);
   scene.add(mesh);
 
-  
+
   const geometry = new THREE.BufferGeometry();
   const vertices = [];
 
@@ -63,10 +63,10 @@ function init() {
 }
 
 function handleMouseMove(event) {
-  const mouseX = (event.clientX / window.innerWidth) * 2 + 1;
+  const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
   const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-  camera.rotation.y = mouseX * Math.PI * 0.2;
-  camera.rotation.x = mouseY * Math.PI * 0.2;
+  camera.rotation.y = mouseX * Math.PI * 0.5;
+  camera.rotation.x = mouseY * Math.PI * 0.5;
 }
 
 function onWindowResize() {
@@ -87,7 +87,10 @@ function loadModel() {
 
 function createGrid() {
   const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-  const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+
+  const material = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(Math.random(), Math.random(), Math.random()) // Random RGB values between 0 and 1
+  });
 
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
@@ -125,5 +128,5 @@ function render() {
 
   renderer.render(scene, camera);
 
-  
+
 }
