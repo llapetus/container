@@ -134,7 +134,7 @@ function render() {
   // Apply transformations (wave effect)
   cubes.forEach((cube) => {
     const { x, z } = cube.position;
-    cube.scale.setScalar(1 + vol * 0.01); 
+    cube.scale.setScalar(1 + vol * 10); 
     cube.position.y = Math.sin(time + x + z) * 1.5;
     cube.rotation.y += 0.01;
   });
