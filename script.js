@@ -10,8 +10,20 @@ const radius = 2;
 const clock = new THREE.Clock();
 let angle = 0;
 
-init();
-animate();
+
+let audioLevel = 0;
+
+function setup() {
+  noCanvas();
+  init();
+  fft = new p5.FFT();
+}
+
+function draw()
+{
+  audioLevel = fft.analyze()[0]; // or whatever metric you ne
+  animate();
+}
 
 document.addEventListener('mousemove', handleMouseMove);
 window.addEventListener('resize', onWindowResize);
@@ -120,6 +132,7 @@ function render() {
   // Apply transformations (wave effect)
   cubes.forEach((cube) => {
     const { x, z } = cube.position;
+    cube.scale.setScalar(1 + audioLevel * 0.01); 
     cube.position.y = Math.sin(time + x + z) * 1.5;
     cube.rotation.y += 0.01;
   });
