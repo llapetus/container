@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { XRButton } from 'three/examples/jsm/webxr/XRButton.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import 
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; // Uncomment if needed
+
 let camera, scene, renderer;
 const cubes = []; // Store cubes for grid
 const gridSize = 10;
@@ -10,14 +10,23 @@ const radius = 2;
 let angle = 0;
 const clock = new THREE.Clock();
 
+// Data for a reactive rectangle drawn with p5.js
+let reactiveRect = {
+  x: 50,
+  y: 50,
+  w: 100,
+  h: 50,
+  color: 255 // white initially
+};
+
 function initThree() {
   scene = new THREE.Scene();
 
-  // Use p5's width/height for Three.js camera aspect & renderer size
+  // Use p5's windowWidth/windowHeight for Three.js camera aspect & renderer size
   camera = new THREE.PerspectiveCamera(70, windowWidth / windowHeight, 0.1, 10);
   camera.position.set(0, 1, 10);
 
-  // Create a Three.js renderer; we allow transparency so p5.js background can show if desired
+  // Create a Three.js renderer; enable transparency so p5's canvas can show through if needed
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(windowWidth, windowHeight);
@@ -95,35 +104,53 @@ function updateScene() {
 // === p5.js functions ===
 
 function setup() {
-  
-  // Create a p5 canvas (this can serve as your UI/background layer).
+  // Create a p5 canvas (this serves as the UI/background layer).
   createCanvas(windowWidth, windowHeight);
-  
-  background(black);// Initialize Three.js (it creates its own canvas which is appended to the document).
-  initThree();
+  background(0); // Set initial p5 background to black.
+  initThree();  // Initialize the Three.js scene.
 }
 
 function draw() {
-  // Optional: draw a p5 background (this draws on the p5 canvas, which is separate from the Three.js canvas).
+  // Draw a p5 background.
   background(200);
 
   // Update Three.js scene elements.
   updateScene();
-
   // Render the Three.js scene.
   renderer.render(scene, camera);
+
+  // Draw the reactive rectangle on top of the p5 canvas.
+  fill(reactiveRect.color);
+  rect(reactiveRect.x, reactiveRect.y, reactiveRect.w, reactiveRect.h);
 }
 
-// Instead of document.addEventListener('mousemove', ...), use p5's mouseMoved.
+function mouseClicked() {
+  // Check if the mouse click is inside the rectangle.
+  if (
+    mouseX > reactiveRect.x &&
+    mouseX < reactiveRect.x + reactiveRect.w &&
+    mouseY > reactiveRect.y &&
+    mouseY < reactiveRect.y + reactiveRect.h
+  ) {
+    // Toggle the rectangle's color.
+    if (reactiveRect.color === 255) {
+      reactiveRect.color = color(0, 255, 0); // Change to green.
+    } else {
+      reactiveRect.color = 255; // Change back to white.
+    }
+  }
+}
+
 function mouseMoved() {
+  // Optionally update the camera's rotation based on mouse movement.
   const mouseXNorm = (mouseX / windowWidth) * 2 - 1;
   const mouseYNorm = -(mouseY / windowHeight) * 2 + 1;
   camera.rotation.y = mouseXNorm * Math.PI * 0.5;
   camera.rotation.x = mouseYNorm * Math.PI * 0.5;
 }
 
-// Use p5's windowResized instead of window.addEventListener.
 function windowResized() {
+  // Adjust both the p5 canvas and the Three.js renderer when the window is resized.
   resizeCanvas(windowWidth, windowHeight);
   camera.aspect = windowWidth / windowHeight;
   camera.updateProjectionMatrix();
