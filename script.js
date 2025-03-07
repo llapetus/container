@@ -63,7 +63,7 @@ function init() {
 }
 
 function handleMouseMove(event) {
-  const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+  const mouseX = -(event.clientX / window.innerWidth) * 2 - 1;
   const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
   camera.rotation.y = mouseX * Math.PI * 0.5;
   camera.rotation.x = mouseY * Math.PI * 0.5;
