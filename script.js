@@ -1,132 +1,83 @@
-import * as THREE from 'three';
-import { XRButton } from 'three/examples/jsm/webxr/XRButton.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
 let camera, scene, renderer;
-const cubes = []; // Store cubes
+let cubes = [];
 const gridSize = 10;
 const spacing = 0.6;
-const radius = 2;
 const clock = new THREE.Clock();
 let angle = 0;
 
-init();
-animate();
+function setup() {
+  // Create a p5 canvas in WEBGL mode
+  const cnv = createCanvas(windowWidth, windowHeight, WEBGL);
 
-document.addEventListener('mousemove', handleMouseMove);
-window.addEventListener('resize', onWindowResize);
+  // Create a three.js renderer using the p5 canvas element
+  renderer = new THREE.WebGLRenderer({ antialias: true, canvas: cnv.elt });
+  renderer.setSize(windowWidth, windowHeight);
+  renderer.xr.enabled = true;  // Enable XR support
 
-
-
-function init() {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  scene = new THREE.Scene();
-
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10);
-  camera.position.set(0, 1, 10);
-
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.xr.enabled = true;
-  container.appendChild(renderer.domElement);
+  // Append the XR button to allow entering VR mode
   document.body.appendChild(XRButton.createButton(renderer));
 
+  // Create a three.js scene and perspective camera
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(70, windowWidth / windowHeight, 0.1, 1000);
+  camera.position.set(0, 1, 10);
+
+  // Add a basic light to the scene
   const light = new THREE.HemisphereLight(0xffffff, 0x444444);
   light.position.set(0, 2, 0);
   scene.add(light);
 
+  // Add a basic cube to the scene
+  const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  const boxGeometry = new THREE.BoxGeometry(1, 1, 1); // Correct definition
-  const mesh = new THREE.Mesh(boxGeometry, material);
-  scene.add(mesh);
+  const cube = new THREE.Mesh(boxGeometry, material);
+  scene.add(cube);
 
-
-  const geometry = new THREE.BufferGeometry();
-  const vertices = [];
-
-  for (let i = 0; i < 10000; i++) {
-    vertices.push(THREE.MathUtils.randFloatSpread(2000)); // x
-    vertices.push(THREE.MathUtils.randFloatSpread(2000)); // y
-    vertices.push(THREE.MathUtils.randFloatSpread(2000)); // z
-  }
-
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-  const particles = new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0x888888 }));
-  scene.add(particles);
-
-  loadModel();
-  createGrid();
-}
-
-function handleMouseMove(event) {
-  const mouseX = -(event.clientX / window.innerWidth) * 2 - 1;
-  const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-  camera.rotation.y = mouseX * Math.PI * 0.5;
-  camera.rotation.x = mouseY * Math.PI * 0.5;
-}
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function loadModel() {
-  const loader = new GLTFLoader();
-  loader.load('./models/scene.gltf', (gltf) => {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    scene.add(gltf.scene);
-  }, undefined, (error) => {
-    console.error('Error loading model:', error);
-  });
-}
-
-function createGrid() {
-  const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-
-  const material = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(Math.random(), Math.random(), Math.random()) // Random RGB values between 0 and 1
-  });
-
+  // Create a grid of smaller cubes with random colors and random heights
+  const cubeGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      const cube = new THREE.Mesh(geometry, material);
-      cube.position.set(
+      const cubeMaterial = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(Math.random(), Math.random(), Math.random())
+      });
+      const smallCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+      smallCube.position.set(
         (i - gridSize / 2) * spacing,
-        Math.random() * 2, // Random height
+        Math.random() * 2,
         (j - gridSize / 2) * spacing
       );
-      scene.add(cube);
-      cubes.push(cube);
+      scene.add(smallCube);
+      cubes.push(smallCube);
     }
   }
 }
 
-function animate() {
-  renderer.setAnimationLoop(render);
-}
-
-function render() {
+function draw() {
+  // Update animation timing
   const delta = clock.getDelta();
   const time = clock.getElapsedTime();
-
   angle += delta * 1.5;
-  //camera.position.x = Math.cos(angle) * radius;
-  //camera.position.z = Math.sin(angle) * radius;
-  // camera.lookAt(0, 0, 0);
 
-  // Apply transformations (wave effect)
-  cubes.forEach((cube) => {
+  // Animate each cube with a wave effect and a slight rotation
+  cubes.forEach(cube => {
     const { x, z } = cube.position;
     cube.position.y = Math.sin(time + x + z) * 1.5;
     cube.rotation.y += 0.01;
   });
 
+  // Map p5 mouse positions to camera rotations
+  const mx = map(mouseX, 0, width, -1, 1);
+  const my = map(mouseY, 0, height, -1, 1);
+  camera.rotation.y = -mx * Math.PI * 0.5; // Invert for intuitive left/right movement
+  camera.rotation.x = my * Math.PI * 0.5;
+
+  // Render the three.js scene
   renderer.render(scene, camera);
+}
 
-
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  renderer.setSize(windowWidth, windowHeight);
+  camera.aspect = windowWidth / windowHeight;
+  camera.updateProjectionMatrix();
 }
