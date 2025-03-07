@@ -44,6 +44,15 @@ function init() {
   scene.add(mesh);
 
   
+// Create a pivot and add the camera to it
+const pivot = new THREE.Object3D();
+scene.add(pivot);
+pivot.add(camera);
+
+// Adjust the camera's position relative to the pivot
+camera.position.set(0, 0, 10); // Camera is now 10 units away from the pivot
+
+  
   const geometry = new THREE.BufferGeometry();
   const vertices = [];
 
@@ -61,13 +70,15 @@ function init() {
   loadModel();
   createGrid();
 }
-
 function handleMouseMove(event) {
   const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
   const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-  camera.rotation.y = mouseX * Math.PI * 0.5;
-  camera.rotation.x = mouseY * Math.PI * 0.5;
+  
+  // Rotate the pivot based on the mouse. This rotates the entire camera setup.
+  pivot.rotation.y = mouseX * Math.PI * 0.5;
+  pivot.rotation.x = mouseY * Math.PI * 0.5;
 }
+
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -124,4 +135,6 @@ function render() {
   });
 
   renderer.render(scene, camera);
+
+  
 }
