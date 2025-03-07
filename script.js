@@ -15,16 +15,17 @@ let audioLevel = 0;
 
 function setup() {
   noCanvas();
-  init();
+ 
   fft = new p5.FFT();
 }
 
 function draw()
 {
   audioLevel = fft.analyze()[0]; // or whatever metric you ne
-  animate();
+ 
 }
-
+init();
+animate();
 document.addEventListener('mousemove', handleMouseMove);
 window.addEventListener('resize', onWindowResize);
 
