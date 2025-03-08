@@ -13,33 +13,82 @@ const spacing = 0.6;
 const radius = 2;
 const clock = new THREE.Clock();
 
+let frameCount = 0;
+const n = 100; // update every 10th frame
+
+
+let mousePosX =0;
+let mousePosY =0;
+
 let angle = 0;
+
+let angleX = 0;
+let angleY = 0;
 let audioLevel = 0;
 let mic, amplitude;
 
 // Define your sketch using the global p5 variable
 const sketch = (p) => {
   p.setup = () => {
-      p.noCanvas();
-      // Create a new AudioIn instance and start it
+    p.noCanvas();
+    // Create a new AudioIn instance and start it
     mic = new p5.AudioIn();
     mic.start();
 
     // Create an Amplitude analyzer and set its input to the microphone
     amplitude = new p5.Amplitude();
     amplitude.setInput(mic);
-    
-      init();
+
+    init();
   };
 
   p.draw = () => {
-      // Get the current volume level (a value between 0 and ~1)
+    // Get the current volume level (a value between 0 and ~1)
     let vol = amplitude.getLevel();
 
     // Map the volume to a scale factor (for example, from 0.5 to 2 times)
     let scaleFactor = p.map(vol, 0, 1, 0.5, 2);
     animate();
-    
+  };
+
+
+  
+  // Define keyPressed correctly for instance mode
+  p.keyPressed = () => {
+    console.log("ahoj");
+    if (p.key === 'd') {
+      console.log("aaaaa");
+
+      if (loadedModel) {
+        // For example, move the model along the x-axis over time
+        loadedModel.position.x += 1;
+
+      }
+
+    } else if (p.key === 'a') {
+      console.log("ssssssss");
+      if (loadedModel) {
+        // For example, move the model along the x-axis over time
+        loadedModel.position.x -= 1;
+
+      }
+
+    }else if (p.key === 's') {
+      console.log("aaaa");
+      if (loadedModel) {
+        // For example, move the model along the x-axis over time
+        loadedModel.position.y -= 1;
+
+      }
+    } else if (p.key === 'w') {
+      console.log("dddd");
+
+      if (loadedModel) {
+        // For example, move the model along the x-axis over time
+        loadedModel.position.y += 1;
+
+      }
+    }
   };
 };
 
@@ -47,8 +96,12 @@ const sketch = (p) => {
 new p5(sketch);
 
 function handleMouseMove(event) {
+  
   const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
   const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+  mousePosX = mouseX;
+  mousePosY = mouseY;
+
   camera.rotation.y = -mouseX * Math.PI * 0.5;
   camera.rotation.x = mouseY * Math.PI * 0.5;
 }
@@ -62,8 +115,8 @@ function init() {
 
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10);
-  camera.position.set(0, 1, 10);
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10);
+  camera.position.set(0,1, 100);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -99,18 +152,20 @@ function init() {
   createGrid();
 }
 
-
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
+let loadedModel;
 
 function loadModel() {
   const loader = new GLTFLoader();
   loader.load('./models/scene.gltf', (gltf) => {
     gltf.scene.scale.set(0.5, 0.5, 0.5);
     scene.add(gltf.scene);
+    // Store the loaded model for later use
+    loadedModel = gltf.scene;
   }, undefined, (error) => {
     console.error('Error loading model:', error);
   });
@@ -118,9 +173,8 @@ function loadModel() {
 
 function createGrid() {
   const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-
   const material = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(Math.random(), Math.random(), Math.random()) // Random RGB values between 0 and 1
+    color: new THREE.Color(Math.random(), Math.random(), Math.random()) // Random RGB values between 0 and 1
   });
 
   for (let i = 0; i < gridSize; i++) {
@@ -138,6 +192,9 @@ function createGrid() {
 }
 
 function animate() {
+
+
+  frameCount++;
   renderer.setAnimationLoop(render);
 }
 
@@ -145,16 +202,24 @@ function render() {
   const delta = clock.getDelta();
   const time = clock.getElapsedTime();
 
-  angle += delta * 1.5;
-  //camera.position.x = Math.cos(angle) * radius;
-  //camera.position.z = Math.sin(angle) * radius;
-  // camera.lookAt(0, 0, 0);
+  angleX += delta * mousePosX;
+  angleY+= delta * mousePosY;
+  camera.position.x = Math.cos(angleX) * radius;
+  camera.position.z = Math.sin(angleX) * radius;
+
+  camera.lookAt(0, 0, 0);
 
   // Apply transformations (wave effect)
   cubes.forEach((cube) => {
     const { x, z } = cube.position;
     cube.position.y = Math.sin(time + x + z) * 1.5;
     cube.rotation.y += 0.01;
+// Check if the current frame is a multiple of n
+if (frameCount % n === 0) {
+  // For example, move the cube along the x-axis every nth frame
+  cube.scale.set(Math.random() * 2, Math.random() * 2, Math.random() * 2);
+}
+//cube.scale = Math.random()*10;}
   });
 
   renderer.render(scene, camera);
