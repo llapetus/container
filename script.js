@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { XRButton } from 'three/examples/jsm/webxr/XRButton.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import p5 from 'https://cdn.skypack.dev/p5';
 
 let camera, scene, renderer;
 const cubes = []; // Store cubes
